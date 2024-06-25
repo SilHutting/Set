@@ -7,7 +7,7 @@ public class Game
 {
     public long Id { get; set; }
     public long PlayerId { get; set; }
-    public Card[] Cards { get; set; }
+    public Card[] TableCards { get; set; }
     public Card[] Deck { get; set; }
     // Found sets (3 cards each)
     public Card[][] Sets { get; set; }
@@ -15,7 +15,7 @@ public class Game
     public bool GameOver { get; set; }
     public Game()
     {
-        Cards = new Card[12];
+        TableCards = new Card[12];
         Deck = new Card[81];
         for (int i = 0; i < 3; i++)
         {
@@ -38,13 +38,13 @@ public class Game
             // Fill game with random cards by drawing from deck
             for (int i = 0; i < 12; i++)
             {
-                Cards[i] = DrawCard();
+                TableCards[i] = DrawCard();
             }
             if (!TableSetPossible())
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    PutCardBack(Cards[i]);
+                    PutCardBack(TableCards[i]);
                 }
             }
         }
@@ -60,7 +60,7 @@ public class Game
             {
                 for (int k = j + 1; k < 12; k++)
                 {
-                    if (Cards[i].IsSet(Cards[j], Cards[k]))
+                    if (TableCards[i].IsSet(TableCards[j], TableCards[k]))
                     {
                         return true;
                     }
@@ -89,11 +89,11 @@ public class Game
     {
         // We diverge from normal game rules, so take note.
         // Victory is achieved when the deck is empty AND there are less than 12 cards on the table.
-        if (Deck.Length == 0 && Cards.Length < 12)
+        if (Deck.Length == 0 && TableCards.Length < 12)
         {
             return true;
             // Victory is also achieved when the deck is empty AND there are 12 cards on the table, but no set is possible.
-        } else if(Deck.Length == 0 && Cards.Length == 12 && !TableSetPossible()){
+        } else if(Deck.Length == 0 && TableCards.Length == 12 && !TableSetPossible()){
             return true;
         }
         return false;
@@ -136,9 +136,9 @@ public class Game
             return;
         }
 
-        for (int i = startIndex; i < Cards.Length; i++)
+        for (int i = startIndex; i < TableCards.Length; i++)
         {
-            currentSet.Add(Cards[i]);
+            currentSet.Add(TableCards[i]);
             FindSets(currentSet, i + 1, sets);
             currentSet.RemoveAt(currentSet.Count - 1);
         }
@@ -147,7 +147,7 @@ public class Game
     // remove cards from table
     public void RemoveCards(Card card1, Card card2, Card card3)
     {
-        Cards = Cards.Where(card => card != card1 && card != card2 && card != card3).ToArray();
+        TableCards = TableCards.Where(card => card != card1 && card != card2 && card != card3).ToArray();
     }
 
     // Add new cards to table
@@ -165,9 +165,9 @@ public class Game
             {
                 for (int k = j + 1; k < 12; k++)
                 {
-                    if (Cards[i].IsSet(Cards[j], Cards[k]))
+                    if (TableCards[i].IsSet(TableCards[j], TableCards[k]))
                     {
-                        return new Card[] { Cards[i], Cards[j], Cards[k] };
+                        return new Card[] { TableCards[i], TableCards[j], TableCards[k] };
                     }
                 }
             }
