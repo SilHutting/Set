@@ -1,4 +1,4 @@
-namespace CardApi.Models;
+namespace Set.Models;
 public enum Shape
 {
     golf,

@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 
-namespace CardApi.Models;
+namespace Set.Models;
 
 public class CardContext : DbContext
 {

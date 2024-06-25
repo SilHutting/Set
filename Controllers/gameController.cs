@@ -9,18 +9,18 @@ using Set.Models;
 
 namespace Set.Controllers
 {
-    [Route("api/test")]
+    [Route("api/game")]
     [ApiController]
-    public class CardController : ControllerBase
+    public class GameController : ControllerBase
     {
         private readonly CardContext _context;
 
-        public CardController(CardContext context)
+        public GameController(CardContext context)
         {
             _context = context;
         }
 
-        // GET: api/Card
+        // POST: api/game
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Card>>> GetCard()
         {

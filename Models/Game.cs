@@ -1,4 +1,4 @@
-using CardApi.Models;
+using Set.Models;
 
 namespace Set.Models;
 
