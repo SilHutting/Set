@@ -40,7 +40,7 @@ public class Game
         Score = 0;
         GameOver = false;
 
-        while(!setPossible(){
+        while(!setPossible()){
             // Fill game with random cards by drawing from deck
             for (int i = 0; i < 12; i++)
             {
