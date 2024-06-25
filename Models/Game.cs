@@ -107,7 +107,7 @@ public class Game
             RemoveCards(card1, card2, card3);
             Sets.Append(new Card[] { card1, card2, card3 });
             Score++;
-            
+
             // Game ended?
             if (CheckVictory())
             {
@@ -117,6 +117,30 @@ public class Game
 
             // Add new cards to table
             AddCards();
+        }
+    }
+    
+    // Determine all possible Sets of cards on the table using backtracking algorithm
+    public List<Card[]> FindAllSets()
+    {
+        List<Card[]> sets = new List<Card[]>();
+        FindSets(new List<Card>(), 0, sets);
+        return sets;
+    }
+
+    private void FindSets(List<Card> currentSet, int startIndex, List<Card[]> sets)
+    {
+        if (currentSet.Count == 3)
+        {
+            sets.Add(currentSet.ToArray());
+            return;
+        }
+
+        for (int i = startIndex; i < Cards.Length; i++)
+        {
+            currentSet.Add(Cards[i]);
+            FindSets(currentSet, i + 1, sets);
+            currentSet.RemoveAt(currentSet.Count - 1);
         }
     }
 
