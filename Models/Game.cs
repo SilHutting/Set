@@ -1,5 +1,4 @@
 using Set.Models;
-
 namespace Set.Models;
 
 
@@ -8,7 +7,7 @@ public class Game
     public long Id { get; set; }
     public long PlayerId { get; set; }
     public Card[] TableCards { get; set; }
-    public Card[] Deck { get; set; }
+    public Deck Deck { get; set; }
     // Found sets (3 cards each)
     public Card[][] Sets { get; set; }
     public int Score { get; set; }
@@ -16,20 +15,7 @@ public class Game
     public Game()
     {
         TableCards = new Card[12];
-        Deck = new Card[81];
-        for (int i = 0; i < 3; i++)
-        {
-            for (int j = 0; j < 3; j++)
-            {
-                for (int k = 0; k < 3; k++)
-                {
-                    for (int l = 0; l < 3; l++)
-                    {
-                        Deck[i * 27 + j * 9 + k * 3 + l] = new Card((Shape)i, (Fill)j, (Color)k, (Number)l);
-                    }
-                }
-            }
-        }
+        Deck = new Deck();
         Sets = new Card[0][]; // Empty array
         Score = 0;
         GameOver = false;
@@ -38,13 +24,13 @@ public class Game
             // Fill game with random cards by drawing from deck
             for (int i = 0; i < 12; i++)
             {
-                TableCards[i] = DrawCard();
+                TableCards[i] = Deck.DrawCard();
             }
             if (!TableSetPossible())
             {
                 for (int i = 0; i < 12; i++)
                 {
-                    PutCardBack(TableCards[i]);
+                    Deck.PutCardBack(TableCards[i]);
                 }
             }
         }
@@ -70,30 +56,18 @@ public class Game
         return false;
     }
 
-    // Draw cards from deck
-    public Card DrawCard()
-    {
-        int suggestedCard = new Random().Next(Deck.Length);
-        Card card = Deck[suggestedCard];
-        // Remove card from deck
-        Deck = Deck.Where((source, index) => index != suggestedCard).ToArray();
-        return card;
-    }
-    public void PutCardBack(Card card)
-    {
-        Deck.Append(card);
-    }
+
 
     // Check for victory
     public bool CheckVictory()
     {
         // We diverge from normal game rules, so take note.
         // Victory is achieved when the deck is empty AND there are less than 12 cards on the table.
-        if (Deck.Length == 0 && TableCards.Length < 12)
+        if (Deck.Cards.Length == 0 && TableCards.Length < 12)
         {
             return true;
             // Victory is also achieved when the deck is empty AND there are 12 cards on the table, but no set is possible.
-        } else if(Deck.Length == 0 && TableCards.Length == 12 && !TableSetPossible()){
+        } else if(Deck.Cards.Length == 0 && TableCards.Length == 12 && !TableSetPossible()){
             return true;
         }
         return false;
@@ -153,6 +127,10 @@ public class Game
     // Add new cards to table
     public void AddCards()
     {
+        for (int i = 0; i < 3; i++)
+        {
+            TableCards.Append(Deck.DrawCard());
+        }
     }
 
     // Show hint (a set that is possible on the table) by highlighting 2 out of 3 cards
@@ -183,3 +161,5 @@ public class Game
     }
 
 }
+
+

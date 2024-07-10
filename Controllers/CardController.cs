@@ -9,7 +9,7 @@ using Set.Models;
 
 namespace Set.Controllers
 {
-    [Route("api/test")]
+    [Route("api/card")]
     [ApiController]
     public class CardController : ControllerBase
     {
