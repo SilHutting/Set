@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Set.Models
 
-namespace Set.Models;
+namespace Set.Data;
 
 public class CardContext : DbContext
 {
