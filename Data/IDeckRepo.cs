@@ -6,7 +6,7 @@ namespace Set.Data
     {
         // Declare the methods for the Deck repository
         void AddCard(Card card);
-        void RemoveCard(Card card);
+        Card DrawCard();
         IEnumerable<Card> GetAllCards();
         Card GetCardById(int id);
     }

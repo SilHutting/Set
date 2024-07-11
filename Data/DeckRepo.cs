@@ -4,12 +4,33 @@ namespace Set.Data
 {
     public class DeckRepo : iDeckRepo
     {
+        private Card[] Cards { get; set; }
+
+        public DeckRepo()
+        {
+            Cards = new Card[81];
+            int index = 0;
+            for (int i = 1; i <= 3; i++)
+            {
+                for (int j = 1; j <= 3; j++)
+                {
+                    for (int k = 1; k <= 3; k++)
+                    {
+                        for (int l = 1; l <= 3; l++)
+                        {
+                            Cards[index] = new Card((Shape)i, (Fill)j, (Color)k, (Number)l);
+                            index++;
+                        }
+                    }
+                }
+            }
+        }
         public void AddCard(Card card)
         {
             throw new NotImplementedException();
         }
 
-        public void RemoveCard(Card card)
+        public Card DrawCard()
         {
             int suggestedCard = new Random().Next(Cards.Length);
             Card card = Cards[suggestedCard];
