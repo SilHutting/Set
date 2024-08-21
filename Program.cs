@@ -9,9 +9,10 @@ builder.Services.AddControllers();
 //builder.Services.AddSingleton<ITodoRepository, TodoRepository>();
 builder.Services.AddScoped<IGameRepo, GameRepo>();
 
-builder.Services.AddDbContext<TodoContext>(opt =>
-    opt.UseInMemoryDatabase("myDb"));
+//TODO: Migrate do MsSQL Server
 builder.Services.AddDbContext<CardContext>(opt =>
+    opt.UseInMemoryDatabase("myDb"));
+builder.Services.AddDbContext<DeckContext>(opt =>
     opt.UseInMemoryDatabase("myDb"));
 builder.Services.AddDbContext<GameContext>(opt =>
     opt.UseInMemoryDatabase("myDb"));
@@ -19,6 +20,8 @@ builder.Services.AddDbContext<GameContext>(opt =>
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 var app = builder.Build();
 
