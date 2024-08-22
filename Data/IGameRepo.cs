@@ -6,9 +6,11 @@ namespace Set.Data
 {
     public interface IGameRepo
     {
-        IEnumerable<Game> GetAllGames();
-        Game GetGameById(int id);
+        Task<IEnumerable<Game>> GetAllGames();
+        Task<Game> GetGameById(int id);
         void CreateGame(Game game);
-        void DeleteGame(int id);
+        void DeleteGame(Game game);
+
+        bool SaveChanges();
     }
 }

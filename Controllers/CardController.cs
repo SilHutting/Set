@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Set.Data;
 using Set.Models;
 
 namespace Set.Controllers
@@ -13,9 +15,9 @@ namespace Set.Controllers
     [ApiController]
     public class CardController : ControllerBase
     {
-        private readonly CardContext _context;
+        private readonly SetContext _context;
 
-        public CardController(CardContext context)
+        public CardController(SetContext context)
         {
             _context = context;
         }

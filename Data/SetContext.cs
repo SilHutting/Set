@@ -1,40 +1,44 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Set.Models;
 
 namespace Set.Data;
-public class CardContext : DbContext
+public class SetContext : DbContext
 {
-    public CardContext(DbContextOptions<CardContext> options)
+    public SetContext(DbContextOptions<SetContext> options)
         : base(options)
     {
     }
-
+    public DbSet<Game> Game { get; set; } = null!;
+    public DbSet<Deck> Deck { get; set; } = null!;
     public DbSet<Card> Card { get; set; } = null!;
-}
-public class TodoContext : DbContext
-{
-    public TodoContext(DbContextOptions<TodoContext> options)
-        : base(options)
-    {
-    }
 
-    public DbSet<TodoItem> TodoItems { get; set; } = null!;
-}
-public class GameContext : DbContext
-{
-    public GameContext(DbContextOptions<GameContext> options)
-        : base(options)
-    {
-    }
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                
+            }
+        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Game>(e =>
+            {
+                e.ToTable("Game");
 
-    public DbSet<Game> game { get; set; } = null!;
-}
-public class DeckContext : DbContext
-{
-    public DeckContext(DbContextOptions<DeckContext> options)
-        : base(options)
-    {
-    }
+                e.HasKey(e => e.Id);
+                e.Property(e => e.Id).ValueGeneratedOnAdd();
+                //e.HasMany(e => e.Cards);
+            });
 
-    public DbSet<Deck> deck { get; set; } = null!;
+            modelBuilder.Entity<Card>(e =>
+            {
+                e.ToTable("Card");
+
+                e.HasKey(e => e.Id);
+                e.Property(e => e.Id).ValueGeneratedOnAdd();
+                e.HasOne(e => e.Game).WithMany(e => e.TableCards).HasForeignKey(e => e.GameId).OnDelete(DeleteBehavior.Cascade);
+            });
+        }
 }

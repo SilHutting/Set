@@ -1,30 +1,32 @@
-using Set.Models;
 namespace Set.Models;
-
+using System.ComponentModel.DataAnnotations;
 
 public class Game
 {
+    [Key]
+    [Required]
     public long Id { get; set; }
-    public long PlayerId { get; set; }
-    public Card[] TableCards { get; set; }
+    public virtual List<Card> TableCards { get; set; }
     public Deck Deck { get; set; }
     // Found sets (3 cards each)
-    public Card[][] Sets { get; set; }
+    //public List<Card> Sets { get; set; }
     public int Score { get; set; }
     public bool GameOver { get; set; }
+
     public Game()
     {
-        TableCards = new Card[12];
+        TableCards = new List<Card>(12);
         Deck = new Deck();
-        Sets = new Card[0][]; // Empty array
+        //Sets = new List<Card>();
         Score = 0;
         GameOver = false;
 
-        while(!TableSetPossible()){
+        while (true)
+        {
             // Fill game with random cards by drawing from deck
             for (int i = 0; i < 12; i++)
             {
-                TableCards[i] = Deck.DrawCard();
+                TableCards.Add(Deck.DrawCard());
             }
             if (!TableSetPossible())
             {
@@ -32,54 +34,47 @@ public class Game
                 {
                     Deck.PutCardBack(TableCards[i]);
                 }
+                TableCards.Clear();
+            }
+            else
+            {
+                break;
             }
         }
-
-
     }
 
+    // Old non-backtracking implementation. TODO: Remove
     public bool TableSetPossible()
     {
-        for (int i = 0; i < 10; i++)
-        {
-            for (int j = i + 1; j < 11; j++)
-            {
-                for (int k = j + 1; k < 12; k++)
-                {
-                    if (TableCards[i].IsSet(TableCards[j], TableCards[k]))
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
+        return FindSets().Count > 0;
     }
-
-
 
     // Check for victory
     public bool CheckVictory()
     {
         // We diverge from normal game rules, so take note.
         // Victory is achieved when the deck is empty AND there are less than 12 cards on the table.
-        if (Deck.Cards.Length == 0 && TableCards.Length < 12)
+        if (Deck.Cards.Count == 0 && TableCards.Count < 12)
         {
             return true;
             // Victory is also achieved when the deck is empty AND there are 12 cards on the table, but no set is possible.
-        } else if(Deck.Cards.Length == 0 && TableCards.Length == 12 && !TableSetPossible()){
+        }
+        else if (Deck.Cards.Count == 0 && TableCards.Count == 12 && !TableSetPossible())
+        {
             return true;
         }
         return false;
     }
-
+/*
     // TODO process set (remove cards from table, add new cards, update score)
     public void ProcessSet(Card card1, Card card2, Card card3)
     {
         if (card1.IsSet(card2, card3))
         {
             RemoveCards(card1, card2, card3);
-            Sets.Append(new Card[] { card1, card2, card3 });
+            Sets.Add(card1);
+            Sets.Add(card2);
+            Sets.Add(card3);
             Score++;
 
             // Game ended?
@@ -93,35 +88,40 @@ public class Game
             AddCards();
         }
     }
-    
+*/
     // Determine all possible Sets of cards on the table using backtracking algorithm
-    public List<Card[]> FindAllSets()
+    public List<List<Card>> FindSets()
     {
-        List<Card[]> sets = new List<Card[]>();
-        FindSets(new List<Card>(), 0, sets);
+        return FindSetsRecursive(new List<Card>(), 0);
+    }
+
+    private List<List<Card>> FindSetsRecursive(List<Card> currentSet, int index)
+    {
+        List<List<Card>> sets = new List<List<Card>>();
+
+        if (currentSet.Count == 3)
+        {
+            if (IsValidSet(currentSet))
+            {
+                sets.Add(new List<Card>(currentSet));
+            }
+            return sets;
+        }
+
+        for (int i = index; i < TableCards.Count; i++)
+        {
+            currentSet.Add(TableCards[i]);
+            sets.AddRange(FindSetsRecursive(currentSet, i + 1));
+            currentSet.RemoveAt(currentSet.Count - 1);
+        }
+
         return sets;
     }
 
-    private void FindSets(List<Card> currentSet, int startIndex, List<Card[]> sets)
-    {
-        if (currentSet.Count == 3)
-        {
-            sets.Add(currentSet.ToArray());
-            return;
-        }
-
-        for (int i = startIndex; i < TableCards.Length; i++)
-        {
-            currentSet.Add(TableCards[i]);
-            FindSets(currentSet, i + 1, sets);
-            currentSet.RemoveAt(currentSet.Count - 1);
-        }
-    }
-
-    // remove cards from table
+    // Remove cards from table
     public void RemoveCards(Card card1, Card card2, Card card3)
     {
-        TableCards = TableCards.Where(card => card != card1 && card != card2 && card != card3).ToArray();
+        TableCards = TableCards.Where(card => card != card1 && card != card2 && card != card3).ToList();
     }
 
     // Add new cards to table
@@ -129,7 +129,7 @@ public class Game
     {
         for (int i = 0; i < 3; i++)
         {
-            TableCards.Append(Deck.DrawCard());
+            TableCards.Add(Deck.DrawCard());
         }
     }
 
@@ -160,6 +160,17 @@ public class Game
         throw new NotImplementedException();
     }
 
+    private static bool IsValidSet(List<Card> cards)
+    {
+        return IsFeatureValid(cards[0].Number, cards[1].Number, cards[2].Number) &&
+                IsFeatureValid((int)cards[0].Shape, (int)cards[1].Shape, (int)cards[2].Shape) &&
+                IsFeatureValid((int)cards[0].Fill, (int)cards[1].Fill, (int)cards[2].Fill) &&
+                IsFeatureValid((int)cards[0].Color, (int)cards[1].Color, (int)cards[2].Color);
+    }
+
+    private static bool IsFeatureValid(int a, int b, int c)
+    {
+        // Aspects of a feature are either all the same or all different
+        return (a == b && b == c) || (a != b && b != c && a != c);
+    }
 }
-
-

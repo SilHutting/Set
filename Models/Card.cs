@@ -1,4 +1,5 @@
 namespace Set.Models;
+using System.ComponentModel.DataAnnotations;
 public enum Shape
 {
     golf,
@@ -17,47 +18,54 @@ public enum Color
     paars,
     rood
 }
-public enum Number
+public enum Status
 {
-    groen,
-    paars,
-    rood
+    deck,
+    board,
+    foundSets
 }
-
-
 public class Card
 {
+    [Key]
+    [Required]
     public long Id { get; set; }
-    public Shape shape { get; set;}
-    public Fill fill { get; set;}
-    public Color color { get; set;}
-    public Number number { get; set;}
+    public Shape Shape { get; set;}
+    public Fill Fill { get; set;}
+    public Color Color { get; set;}
+    public Status Status { get; set;}
+    public int Number { get; set;}
+    public long? GameId { get; set; }
 
-    public Card(Shape shape, Fill fill, Color color, Number number)
+    //public Deck? Deck { get; set; }
+
+    public virtual Game? Game { get; set; }
+
+    public Card(Shape shape, Fill fill, Color color, int number, Status status = Status.deck)
     {
-        this.shape = shape;
-        this.fill = fill;
-        this.color = color;
-        this.number = number;
+        this.Shape = shape;
+        this.Fill = fill;
+        this.Color = color;
+        this.Number = number;
+        this.Status = status;
     }
 
     public override string ToString()
     {
-        return $"{shape} {fill} {color} {number}";
+        return $"{Shape} {Fill} {Color} {Number}";
     }
 
     public string toFileName()
     {
-        return $"{shape}_{fill}_{color}.png";
+        return $"{Shape}_{Fill}_{Color}.png";
     }
 
     internal bool IsSet(Card card1, Card card2)
     {
         // A set is a group of three cards where, for each of the four features, the three cards are either all the same or all different.
-        return (shape == card1.shape && shape == card2.shape || shape != card1.shape && shape != card2.shape && card1.shape != card2.shape) &&
-            (fill == card1.fill && fill == card2.fill || fill != card1.fill && fill != card2.fill && card1.fill != card2.fill) &&
-            (color == card1.color && color == card2.color || color != card1.color && color != card2.color && card1.color != card2.color) &&
-            (number == card1.number && number == card2.number || number != card1.number && number != card2.number && card1.number != card2.number);
+        return (Shape == card1.Shape && Shape == card2.Shape || Shape != card1.Shape && Shape != card2.Shape && card1.Shape != card2.Shape) &&
+            (Fill == card1.Fill && Fill == card2.Fill || Fill != card1.Fill && Fill != card2.Fill && card1.Fill != card2.Fill) &&
+            (Color == card1.Color && Color == card2.Color || Color != card1.Color && Color != card2.Color && card1.Color != card2.Color) &&
+            (Number == card1.Number && Number == card2.Number || Number != card1.Number && Number != card2.Number && card1.Number != card2.Number);
     }
 }
 

@@ -1,11 +1,15 @@
 namespace Set.Models;
+using System.ComponentModel.DataAnnotations;
 
 public class Deck
 {
-    public Card[] Cards { get; set; }
+    [Key]
+    [Required]
+    public long Id { get; set; }
+    public List<Card> Cards { get; set; }
     public Deck()
     {
-        Cards = new Card[81];
+        Cards = new List<Card>(81);
         for (int i = 0; i < 3; i++)
         {
             for (int j = 0; j < 3; j++)
@@ -14,7 +18,8 @@ public class Deck
                 {
                     for (int l = 0; l < 3; l++)
                     {
-                        Cards[i * 27 + j * 9 + k * 3 + l] = new Card((Shape)i, (Fill)j, (Color)k, (Number)l);
+                        int row = (i*27) + (j*9) + (k*3) + l;
+                        Cards.Add(new Card((Shape)i, (Fill)j, (Color)k, (int)l));
                     }
                 }
             }
@@ -24,15 +29,17 @@ public class Deck
     // Draw cards from deck
     public Card DrawCard()
     {
-        int suggestedCard = new Random().Next(Cards.Length);
+        int length = Cards.Count;
+        int suggestedCard = new Random().Next(length);
         Card card = Cards[suggestedCard];
         // Remove card from deck
-        Cards = Cards.Where((source, index) => index != suggestedCard).ToArray();
+        Cards.RemoveAt(suggestedCard);
+
         return card;
     }
     public void PutCardBack(Card card)
     {
-        Cards.Append(card);
+        _ = Cards.Append(card);
     }
     
 }

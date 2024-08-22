@@ -1,25 +1,29 @@
 using System.Collections.Generic;
+using System.Linq;
+using System;
 using Set.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Set.Data {
 
 public class GameRepo : IGameRepo
 {
+    private readonly SetContext _context;
     private List<Game> games;
 
-    public GameRepo()
+    public GameRepo(SetContext context)
     {
-        games = new List<Game>();
+        _context = context;
     }
 
-    public Game GetGameById(int id)
+    public async Task<Game> GetGameById(int id)
     {
-        return games.Find(game => game.Id == id);
+        return await _context.Game.FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public List<Game> GetAllGames()
+    public async Task<List<Game>> GetAllGames()
     {
-        return games;
+        return await _context.Game.ToListAsync();
     }
 
     public void CreateGame(Game game)
@@ -27,18 +31,19 @@ public class GameRepo : IGameRepo
         games.Add(game);
     }
 
-    public void DeleteGame(int id)
+    public void DeleteGame(Game game)
     {
-        Game game = games.Find(g => g.Id == id);
-        if (game != null)
-        {
-            games.Remove(game);
-        }
+        games.Remove(game);
     }
 
-    IEnumerable<Game> IGameRepo.GetAllGames()
+    async Task<IEnumerable<Game>> IGameRepo.GetAllGames()
     {
-        throw new NotImplementedException();
+        return await _context.Game.ToListAsync();
     }
+
+    bool IGameRepo.SaveChanges()
+    {
+        return (_context.SaveChanges() >= 0);
     }
+}
 }

@@ -18,12 +18,16 @@ namespace Set.Data
                     {
                         for (int l = 1; l <= 3; l++)
                         {
-                            Cards[index] = new Card((Shape)i, (Fill)j, (Color)k, (Number)l);
+                            Cards[index] = new Card((Shape)i, (Fill)j, (Color)k, l);
                             index++;
                         }
                     }
                 }
             }
+        }
+        public DeckRepo(Card[] cards)
+        {
+            Cards = cards;
         }
         public void AddCard(Card card)
         {
@@ -32,6 +36,7 @@ namespace Set.Data
 
         public Card DrawCard()
         {
+            // Get random card
             int suggestedCard = new Random().Next(Cards.Length);
             Card card = Cards[suggestedCard];
             // Remove card from deck
@@ -48,5 +53,6 @@ namespace Set.Data
         {
             throw new NotImplementedException();
         }
+        
     }
 }
