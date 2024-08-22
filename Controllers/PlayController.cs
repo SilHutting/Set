@@ -31,18 +31,33 @@ namespace Set.Controllers
             _mapper = mapper;
         }
 
-        // POST: api/Play/5/TrySet
-        [HttpPost("{id}")]
-        public async Task<ActionResult<IEnumerable<Game>>> TrySet(int gameId, SetTryDto setTryDto)
+        // GET: api/Play/5/Hint
+        [HttpGet("{id}/Hint")]
+        public async Task<ActionResult<IEnumerable<Card>>> GetHint(int gameId)
         {
-            var newGameState = _playService.TrySet(gameId, setTryDto);
+            var hint = _playService.GetHint(gameId);
 
-            if (newGameState == null)
+            if (hint == null)
             {
-                return this.StatusCode(StatusCodes.Status200OK, new { Message = "Set is invalid!" });
+                return this.StatusCode(StatusCodes.Status200OK, new { Message = "Game is invalid!" });
             }
 
-            return this.StatusCode(StatusCodes.Status200OK, new { Message = "Set is valid!", Game = newGameState });
+            return this.StatusCode(StatusCodes.Status200OK, new { Message = "Hint retrieved successfully", Hint = hint });
+        }
+
+        // POST: api/Play/5/TrySet
+        [HttpPost("{id}/TrySet")]
+        public async Task<ActionResult<IEnumerable<Game>>> TrySet(int gameId, SetTryDto setTryDto)
+        {
+            var result = _playService.TrySet(gameId, setTryDto);
+
+            if (result == null)
+            {
+                return this.StatusCode(StatusCodes.Status200OK, new { Message = "Game or Set is invalid!" });
+            }
+
+            _context.SaveChanges();
+            return this.StatusCode(StatusCodes.Status200OK, new { Message = "Set is valid!", Game = result });
 
         }
 

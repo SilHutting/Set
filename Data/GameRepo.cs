@@ -16,9 +16,21 @@ public class GameRepo : IGameRepo
         _context = context;
     }
 
-    public async Task<Game> GetGameById(int id)
+    public Game GetGameById(int id)
     {
-        return await _context.Game.FirstOrDefaultAsync(p => p.Id == id);
+        var game =  _context.Game.Include(g => g.TableCards)
+                            .Include(g => g.Deck)
+                            .ThenInclude(d => d.Cards)
+                            .FirstOrDefault(g => g.Id == id); 
+        if (game == null)
+        {
+            return null;
+        }
+        
+        game.Deck.Cards = game.Deck.Cards.Where(card => card.Id != 0).ToList();
+        game.TableCards = _context.Card.Where(c => c.GameId == id && c.Id != 0).ToList();
+        return game;
+
     }
 
     public async Task<List<Game>> GetAllGames()
@@ -26,14 +38,14 @@ public class GameRepo : IGameRepo
         return await _context.Game.ToListAsync();
     }
 
-    public void CreateGame(Game game)
+    public void CreateGame(Game newGame)
     {
-        games.Add(game);
+        _context.Game.Add(newGame);
     }
 
     public void DeleteGame(Game game)
     {
-        games.Remove(game);
+        _context.Game.Remove(game);
     }
 
     async Task<IEnumerable<Game>> IGameRepo.GetAllGames()

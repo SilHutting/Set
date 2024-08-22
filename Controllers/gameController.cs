@@ -44,7 +44,7 @@ namespace Set.Controllers
         public async Task<ActionResult<Game>> GetGame(long id)
         {
             var game = await _context.Game
-                                    //.Include(g => g.TableCards)
+                                    .Include(g => g.TableCards)
                                     .Include(g => g.Deck)
                                     .ThenInclude(d => d.Cards)
                                     .FirstOrDefaultAsync(g => g.Id == id);  
@@ -53,56 +53,51 @@ namespace Set.Controllers
             {
                 return NotFound();
             }
-            var cards = await _context.Card
-                            .Where(c => c.GameId == id && c.Id != 0)
-                            .ToListAsync();
-                            game.TableCards = cards;
+            game.TableCards = await _context.Card.Where(c => c.GameId == id && c.Id != 0).ToListAsync();
             game.Deck.Cards = game.Deck.Cards.Where(card => card.Id != 0).ToList();
 
             return game;
         }
 
-        // PUT: api/Game/5
+        // Patch: api/Game/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutGame(long id, Game game)
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> PatchGame(long id, GameCreateDto gameCreateDto)
         {
-            if (id != game.Id)
+            // Using GameCreateDto instead of Game
+            var game = await _context.Game.FindAsync(id);
+            if (game == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            _context.Entry(game).State = EntityState.Modified;
+            // Map the GameCreateDto to a Game object. User can change game name
+            _mapper.Map(gameCreateDto, game);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!GameExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
+            // Save the changes to the database
+            await _context.SaveChangesAsync();
             return NoContent();
+
         }
 
         // POST: api/Game
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<GameReadDto>> PostGame()
+        public async Task<ActionResult<GameReadDto>> PostGame(GameCreateDto gameCreateDto)
         {
             var newGame = new Game();
-            _context.Game.Add(newGame);
+            // Map the GameCreateDto to a Game object
+            _mapper.Map(gameCreateDto, newGame);
+
+            // Add the new game to the database
+            _gameRepo.CreateGame(newGame);
+            
+            // Save the changes to the database
             await _context.SaveChangesAsync();
 
+            // Map the Game object to a GameReadDto
             var GameReadDto = _mapper.Map<GameReadDto>(newGame);
+            // Return the GameReadDto
             return CreatedAtAction(nameof(GetGame), new { id = newGame.Id }, newGame);
         }
 
@@ -122,9 +117,5 @@ namespace Set.Controllers
             return NoContent();
         }
 
-        private bool GameExists(long id)
-        {
-            return _context.Game.Any(e => e.Id == id);
-        }
     }
 }

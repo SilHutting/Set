@@ -8,6 +8,7 @@ public class Game
     public long Id { get; set; }
     public virtual List<Card> TableCards { get; set; }
     public Deck Deck { get; set; }
+    public string? Name { get; set; }
     // Found sets (3 cards each)
     //public List<Card> Sets { get; set; }
     public int Score { get; set; }
@@ -57,38 +58,15 @@ public class Game
         if (Deck.Cards.Count == 0 && TableCards.Count < 12)
         {
             return true;
-            // Victory is also achieved when the deck is empty AND there are 12 cards on the table, but no set is possible.
-        }
-        else if (Deck.Cards.Count == 0 && TableCards.Count == 12 && !TableSetPossible())
+            
+        }// Victory is also achieved when the deck is empty AND there are 12 cards on the table, but no set is possible.
+        else if (Deck.Cards.Count == 0 && TableCards.Count <= 12 && !TableSetPossible())
         {
             return true;
         }
         return false;
     }
-/*
-    // TODO process set (remove cards from table, add new cards, update score)
-    public void ProcessSet(Card card1, Card card2, Card card3)
-    {
-        if (card1.IsSet(card2, card3))
-        {
-            RemoveCards(card1, card2, card3);
-            Sets.Add(card1);
-            Sets.Add(card2);
-            Sets.Add(card3);
-            Score++;
 
-            // Game ended?
-            if (CheckVictory())
-            {
-                GameOver = true;
-                return;
-            }
-
-            // Add new cards to table
-            AddCards();
-        }
-    }
-*/
     // Determine all possible Sets of cards on the table using backtracking algorithm
     public List<List<Card>> FindSets()
     {
@@ -118,12 +96,6 @@ public class Game
         return sets;
     }
 
-    // Remove cards from table
-    public void RemoveCards(Card card1, Card card2, Card card3)
-    {
-        TableCards = TableCards.Where(card => card != card1 && card != card2 && card != card3).ToList();
-    }
-
     // Add new cards to table
     public void AddCards()
     {
@@ -134,33 +106,16 @@ public class Game
     }
 
     // Show hint (a set that is possible on the table) by highlighting 2 out of 3 cards
-    public Card[] Hint()
+    public List<Card> Hint()
     {
         // It is guaranteed that there is at least one set on the table, so we need not check for that.
-        for (int i = 0; i < 10; i++)
-        {
-            for (int j = i + 1; j < 11; j++)
-            {
-                for (int k = j + 1; k < 12; k++)
-                {
-                    if (TableCards[i].IsSet(TableCards[j], TableCards[k]))
-                    {
-                        return new Card[] { TableCards[i], TableCards[j], TableCards[k] };
-                    }
-                }
-            }
-        }
-        // This should never happen
-        throw new Exception("No set found on table");
+        var allPossibleSets = FindSets();
+        var firstPossibleSet = allPossibleSets[0];
+        var twoCardsOfSet = new List<Card> { firstPossibleSet[0], firstPossibleSet[1] };
+        return twoCardsOfSet;
     }
 
-    // Save game state
-    public void Save()
-    {
-        throw new NotImplementedException();
-    }
-
-    private static bool IsValidSet(List<Card> cards)
+    public static bool IsValidSet(List<Card> cards)
     {
         return IsFeatureValid(cards[0].Number, cards[1].Number, cards[2].Number) &&
                 IsFeatureValid((int)cards[0].Shape, (int)cards[1].Shape, (int)cards[2].Shape) &&

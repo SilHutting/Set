@@ -10,6 +10,7 @@ namespace Set.Profiles
         {
             //  Source      -> Target
             CreateMap<Game, GameReadDto>();
+            CreateMap<GameCreateDto, Game>();
             //CreateMap<SetTryDto, SetTry>();
         }
     }
