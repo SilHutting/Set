@@ -1,5 +1,6 @@
 namespace Set.Models;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 public class Game
 {
@@ -46,6 +47,47 @@ public class Game
         }
     }
 
+    /// <summary>
+    /// If TRUE, board contains atleast 1 set, if FALSE, No more sets are possible
+    /// </summary>
+    /// <returns></returns>
+    private bool TryFindAndReshuffleSets()
+    {
+        // No sets found in current table
+        if (!TableSetPossible())
+        {
+            // Everything back to deck
+            for (int i = 0; i < TableCards.Count; i++)
+            {
+                Deck.PutCardBack(TableCards[i]);
+            }
+            TableCards.Clear();
+
+            // Is there a set in all playable cards?
+            var allPossibleSets = FindSetsRecursive(TableCards, new List<Card>());
+            if (allPossibleSets.Count == 0)
+            {
+                // No sets found in all remaining playable cards
+                return false;
+            } else {
+                var firstSet = allPossibleSets[0];
+                foreach (var card in firstSet)
+                {
+                    Deck.Cards.Remove(card);
+                    TableCards.Add(card);
+                }
+                // Fill remaining table with random cards
+                while (TableCards.Count < 12)
+                {
+                    TableCards.Add(Deck.DrawCard());
+                }
+
+                return true;
+            }
+
+        }else return true;
+    }
+
     public bool TableSetPossible()
     {
         return FindSets().Count > 0;
@@ -56,7 +98,7 @@ public class Game
     {
         // We diverge from normal game rules, so take note.
         // Victory is achieved when the deck is empty AND there are less than 12 cards on the table.
-        if (Deck.Cards.Count == 0 && TableCards.Count < 12)
+        if (TryFindAndReshuffleSets())
         {
             return true;
             
@@ -71,10 +113,10 @@ public class Game
     // Determine all possible Sets of cards on the table using backtracking algorithm
     public List<List<Card>> FindSets()
     {
-        return FindSetsRecursive(new List<Card>(), 0);
+        return FindSetsRecursive(TableCards, new List<Card>());
     }
 
-    private List<List<Card>> FindSetsRecursive(List<Card> currentSet, int index)
+    private List<List<Card>> FindSetsRecursive(List<Card> cardsToSearch, List<Card> currentSet, int index = 0)
     {
         List<List<Card>> sets = new List<List<Card>>();
 
@@ -87,10 +129,10 @@ public class Game
             return sets;
         }
 
-        for (int i = index; i < TableCards.Count; i++)
+        for (int i = index; i < cardsToSearch.Count; i++)
         {
-            currentSet.Add(TableCards[i]);
-            sets.AddRange(FindSetsRecursive(currentSet, i + 1));
+            currentSet.Add(cardsToSearch[i]);
+            sets.AddRange(FindSetsRecursive(cardsToSearch, currentSet, i + 1));
             currentSet.RemoveAt(currentSet.Count - 1);
         }
 

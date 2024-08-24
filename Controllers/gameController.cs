@@ -31,12 +31,11 @@ namespace Set.Controllers
 
         // Get: api/game
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Game>>> GetGame()
+        public async Task<IEnumerable<Game>> GetGame()
         {
             var games = await _gameRepo.GetAllGames();
             //var games = await _context.Game.ToListAsync();
-
-            return this.StatusCode(StatusCodes.Status200OK, new { Message = "Games retrieved successfully", Games = games });
+            return await _gameRepo.GetAllGames();
         }
 
         // GET: api/game/5
@@ -73,7 +72,7 @@ namespace Set.Controllers
 
             // Map the GameCreateDto to a Game object. User can change game name
             _mapper.Map(gameCreateDto, game);
-
+            
             // Save the changes to the database
             await _context.SaveChangesAsync();
             return NoContent();

@@ -28,7 +28,7 @@ namespace Set.Services
                 return null;
             }
             var hint = _game.Hint();
-            
+            this._game.Score -= 1;
             return hint;
         }
         public Game TrySet(int gameId, SetTryDto setTryDto)

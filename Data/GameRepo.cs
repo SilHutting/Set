@@ -33,9 +33,9 @@ public class GameRepo : IGameRepo
 
     }
 
-    public async Task<List<Game>> GetAllGames()
+    public Task<List<Game>> GetAllGames()
     {
-        return await _context.Game.ToListAsync();
+        return _context.Game.ToListAsync();
     }
 
     public void CreateGame(Game newGame)

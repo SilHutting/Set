@@ -41,6 +41,9 @@ namespace Set.Controllers
             {
                 return this.StatusCode(StatusCodes.Status200OK, new { Message = "Game is invalid!" });
             }
+            // Save before we briefly modify the cards for sending
+            _context.SaveChanges();
+
             // Increment Hint number (index to human readable)
             hint[0].Number++;  hint[1].Number++;  
             var hintText = hint[0].ToString() + ", " + hint[1].ToString();
@@ -55,7 +58,10 @@ namespace Set.Controllers
 
             if (result == null)
             {
+                // Also save changes, as decremented the score!
+                _context.SaveChanges();
                 return this.StatusCode(StatusCodes.Status200OK, new { Message = "Game or Set is invalid!" });
+                
             }
 
             _context.SaveChanges();
