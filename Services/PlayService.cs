@@ -42,13 +42,14 @@ namespace Set.Services
             // Print out possible sets
             foreach (var set in possibleSets)
             {
-                System.Console.WriteLine("Possible Set properties: ", set[0].ToString() + ", " + set[1].ToString() + ", " + set[2].ToString());
-                System.Console.WriteLine("Possible Set: " + set[0].Id + ", " + set[1].Id + ", " + set[2].Id);
+                System.Console.WriteLine("PRINT: Possible Set properties: ", set[0].ToString() + ", " + set[1].ToString() + ", " + set[2].ToString());
+                System.Console.WriteLine("PRINT: Possible Set: " + set[0].Id + ", " + set[1].Id + ", " + set[2].Id);
             }
 
             var card1 = _game.TableCards.Find(c => c.Id == setTryDto.CardIds[0]);
             var card2 = _game.TableCards.Find(c => c.Id == setTryDto.CardIds[1]);
             var card3 = _game.TableCards.Find(c => c.Id == setTryDto.CardIds[2]);
+            
             if (card1 == null || card2 == null || card3 == null)
             {
                 return null;
@@ -63,7 +64,8 @@ namespace Set.Services
                 
                 if (_game.TableCards.Count < 12 && _game.Deck.Cards.Count > 3)
                 {
-                    _game.AddCards();
+                    _game.Add3Cards();
+
                 }
                 if(_game.CheckVictory()) {
                     _game.GameOver = true;

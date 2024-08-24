@@ -8,6 +8,8 @@ public class Game
     public long Id { get; set; }
     public virtual List<Card> TableCards { get; set; }
     public Deck Deck { get; set; }
+    [Required]
+    [StringLength(100)]
     public string? Name { get; set; }
     // Found sets (3 cards each)
     //public List<Card> Sets { get; set; }
@@ -44,12 +46,11 @@ public class Game
         }
     }
 
-    // Old non-backtracking implementation. TODO: Remove
     public bool TableSetPossible()
     {
         return FindSets().Count > 0;
     }
-
+    
     // Check for victory
     public bool CheckVictory()
     {
@@ -97,7 +98,7 @@ public class Game
     }
 
     // Add new cards to table
-    public void AddCards()
+    public void Add3Cards()
     {
         for (int i = 0; i < 3; i++)
         {

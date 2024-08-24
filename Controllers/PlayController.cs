@@ -41,8 +41,10 @@ namespace Set.Controllers
             {
                 return this.StatusCode(StatusCodes.Status200OK, new { Message = "Game is invalid!" });
             }
-
-            return this.StatusCode(StatusCodes.Status200OK, new { Message = "Hint retrieved successfully", Hint = hint });
+            // Increment Hint number (index to human readable)
+            hint[0].Number++;  hint[1].Number++;  
+            var hintText = hint[0].ToString() + ", " + hint[1].ToString();
+            return this.StatusCode(StatusCodes.Status200OK, new { Message = "Hint retrieved successfully", Hint = hintText });
         }
 
         // POST: api/Play/5/TrySet

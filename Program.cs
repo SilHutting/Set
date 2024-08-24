@@ -26,8 +26,16 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddMvc(option => option.EnableEndpointRouting = false).AddNewtonsoftJson(opt => opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-var app = builder.Build();
 
+builder.Services.AddCors(options => {
+    options.AddPolicy("allowsetgame", policy  =>
+                      {
+                          policy.WithOrigins("http://localhost:4200",
+                                              "https://localhost:4200")
+                                              .AllowAnyHeader().AllowAnyMethod();
+                      });
+});
+var app = builder.Build();
 // Middleware. Middlewares run in the order they are added.
 #region Middleware
     app.Use(async (context, next) =>
@@ -41,18 +49,20 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.UseCors("allowsetgame");
     app.UseSwagger();
     app.UseSwaggerUI();
     app.UseDeveloperExceptionPage();
 } else {
     // app.UseHsts();
-    app.UseHttpsRedirection();
-    app.UseCors();
+    app.UseCors("allowsetgame");
+    //app.UseHttpsRedirection();
+
     app.UseAuthentication();
     app.UseExceptionHandler();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
