@@ -9,6 +9,7 @@ public class Game
     public long Id { get; set; }
     public virtual List<Card> TableCards { get; set; }
     public Deck Deck { get; set; }
+    public int? NumPossibleSets { get; set; } = null;
     [Required]
     [StringLength(100)]
     public string? Name { get; set; }
@@ -42,6 +43,7 @@ public class Game
             }
             else
             {
+                NumPossibleSets = FindSetsInBoard().Count;
                 break;
             }
         }
@@ -81,37 +83,39 @@ public class Game
                 {
                     TableCards.Add(Deck.DrawCard());
                 }
-
+                NumPossibleSets = FindSetsInBoard().Count;
                 return true;
             }
 
-        }else return true;
+        }else {
+            NumPossibleSets = FindSetsInBoard().Count;
+            return true;
+            }
     }
 
     public bool TableSetPossible()
     {
-        return FindSets().Count > 0;
+        return FindSetsInBoard().Count > 0;
     }
     
     // Check for victory
     public bool CheckVictory()
     {
-        // We diverge from normal game rules, so take note.
-        // Victory is achieved when the deck is empty AND there are less than 12 cards on the table.
-        if (TryFindAndReshuffleSets())
+        if (!TryFindAndReshuffleSets())
         {
             return true;
             
-        }// Victory is also achieved when the deck is empty AND there are 12 cards on the table, but no set is possible.
+        }// Victory is  achieved when the deck is empty AND there are 12 cards on the table, but no set is possible.
         else if (Deck.Cards.Count == 0 && TableCards.Count <= 12 && !TableSetPossible())
         {
             return true;
         }
+        NumPossibleSets = FindSetsInBoard().Count;
         return false;
     }
 
     // Determine all possible Sets of cards on the table using backtracking algorithm
-    public List<List<Card>> FindSets()
+    public List<List<Card>> FindSetsInBoard()
     {
         return FindSetsRecursive(TableCards, new List<Card>());
     }
@@ -152,7 +156,7 @@ public class Game
     public List<Card> Hint()
     {
         // It is guaranteed that there is at least one set on the table, so we need not check for that.
-        var allPossibleSets = FindSets();
+        var allPossibleSets = FindSetsInBoard();
         var firstPossibleSet = allPossibleSets[0];
         var twoCardsOfSet = new List<Card> { firstPossibleSet[0], firstPossibleSet[1] };
         return twoCardsOfSet;

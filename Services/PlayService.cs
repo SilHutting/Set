@@ -31,14 +31,21 @@ namespace Set.Services
             this._game.Score -= 1;
             return hint;
         }
-        public Game TrySet(int gameId, SetTryDto setTryDto)
+
+        /// <summary>
+        /// Returns new game state if set is valid, null otherwise
+        /// </summary>
+        /// <param name="gameId"></param>
+        /// <param name="setTryDto"></param>
+        /// <returns></returns>
+        public Game? TrySet(int gameId, SetTryDto setTryDto)
         {
             LoadGame(gameId);
             if (_game == null)
             {
                 return null;
             }
-            var possibleSets = _game.FindSets();
+            var possibleSets = _game.FindSetsInBoard();
             // Print out possible sets
             foreach (var set in possibleSets)
             {

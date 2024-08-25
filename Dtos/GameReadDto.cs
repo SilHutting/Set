@@ -7,7 +7,7 @@ namespace Set.Dtos
         public string? Name { get; set; }
         public Card[]? TableCards { get; set; }
         public Deck? Deck { get; set; }
-        public Card[]? Sets { get; set; }
+        public int? NumPossibleSets { get; set; }
         public int Score { get; set; }
         public bool GameOver { get; set; }
     }
